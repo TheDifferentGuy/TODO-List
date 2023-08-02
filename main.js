@@ -1,72 +1,127 @@
-window.addEventListener('load', () => {
-   let todos = JSON.parse(localStorage.getItem("todos")) || []
-   
-   const form = document.getElementById('new-task-form')
-   const input = document.getElementById('new-task-input')
-   const list_el = document.getElementById('tasks')
+const list_el = document.getElementById("list");
+const create_btn_el = document.getElementById("create");
 
-   form.addEventListener('submit', (e) => {
-      e.preventDefault()
+let todos = [];
 
-      const task = input.value
-      
-      if (!task) {
-         alert('Please write your task')
-         return
-      } 
+create_btn_el.addEventListener('click', CreateNewTodo);
 
-      const task_el = document.createElement("div")
-      task_el.classList.add("task")
+function CreateNewTodo() {
+   const item = {
+      id: new Date().getTime(),
+      text: "",
+      complete: false
+   }
 
-      const task_content_el = document.createElement("div") 
-      task_content_el.classList.add("content")
-      task_el.appendChild(task_content_el)
+   todos.unshift(item);
 
-      const task_input_el = document.createElement("input")
-      task_input_el.classList.add("text")
-      task_input_el.type = "text"
-      task_input_el.value = task
-      task_input_el.setAttribute("readonly", "readonly")
-      task_content_el.appendChild(task_input_el)
+   const { item_el, input_el } = CreateTodoElement(item);
+
+   list_el.prepend(item_el);
+
+   input_el.removeAttribute("disabled");
+   input_el.focus();
+
+   Save();
+}
 
 
-      const task_actions_el = document.createElement("div")
-      task_actions_el.classList.add("actions")
+function CreateTodoElement(item) {
+   const item_el = document.createElement("div");
+   item_el.classList.add("item");
 
-      const task_edit_el = document.createElement("button")
-      task_edit_el.classList.add("edit")
-      task_edit_el.innerHTML = "Edit"
+   const checkbox = document.createElement("input");
+   checkbox.type = "checkbox";
+   checkbox.checked = item.complete;
 
-      const task_delete_el = document.createElement("button")
-      task_delete_el.classList.add("delete")
-      task_delete_el.innerHTML = "Delete"
+   if (item.complete) {
+      item_el.classList.add("complete");
+   }
 
-      task_actions_el.appendChild(task_edit_el)
-      task_actions_el.appendChild(task_delete_el)
+   const input_el = document.createElement("input");
+   input_el.type = "text";
+   input_el.value = item.text;
+   input_el.setAttribute("disabled", "");
 
-      task_el.appendChild(task_actions_el)
+   const actions_el = document.createElement("div");
+   actions_el.classList.add("actions");
 
-      list_el.appendChild(task_el)
+   const edit_btn_el = document.createElement("button");
+   edit_btn_el.classList.add("material-icons");
+   edit_btn_el.innerText = "edit";
 
-      input.value = ""
+   const remove_btn_el = document.createElement("button");
+   remove_btn_el.classList.add("material-icons", "remove-btn");
+   remove_btn_el.innerText = "remove_circle";
 
-      task_edit_el.addEventListener('click', () => {
-         if (task_edit_el.innerText.toLowerCase() === "edit") {
-            task_input_el.removeAttribute("readonly")
-            task_input_el.focus()
-            task_edit_el.innerText = "Save"
-         } else {
-            task_input_el.setAttribute("readonly", "readonly")
-            task_edit_el.innerText = "Edit"
-         }
-      })
+   actions_el.append(edit_btn_el);
+   actions_el.append(remove_btn_el);
 
-      task_delete_el.addEventListener('click', () => {
-         list_el.removeChild(task_el)
-      })
+   item_el.append(checkbox);
+   item_el.append(input_el);
+   item_el.append(actions_el);
 
-   })
-})
+   // EVENTS
+   checkbox.addEventListener("change", () => {
+      item.complete = checkbox.checked;
 
-// window.localStorage.setItem("list_el", JSON.stringify())
+      if (item.complete) {
+         item_el.classList.add("complete");
+      } else {
+         item_el.classList.remove("complete");
+      }
 
+      Save();
+   });
+
+   input_el.addEventListener("input", () => {
+      item.text = input_el.value;
+   });
+
+   input_el.addEventListener("blur", () => {
+      input_el.setAttribute("disabled", "");
+      Save();
+   });
+
+   edit_btn_el.addEventListener("click", () => {
+      input_el.removeAttribute("disabled");
+      input_el.focus();
+   });
+
+   remove_btn_el.addEventListener("click", () => {
+      todos = todos.filter(t => t.id != item.id);
+
+      item_el.remove();
+
+      Save();
+   });
+
+   return { item_el, input_el, edit_btn_el, remove_btn_el }
+}
+
+function DisplayTodos() {
+   Load();
+
+   for (let i = 0; i < todos.length; i++) {
+      const item = todos[i];
+
+      const { item_el } = CreateTodoElement(item);
+
+      list_el.append(item_el);
+   }
+}
+
+DisplayTodos();
+
+function Save() {
+   const save = JSON.stringify(todos);
+
+   localStorage.setItem("my_todos", save);
+}
+
+function Load() {
+   const data = localStorage.getItem("my_todos");
+
+   if (data) {
+      todos = JSON.parse(data);
+   }
+}
