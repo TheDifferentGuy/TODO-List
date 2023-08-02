@@ -40,15 +40,15 @@ main {
 }
 
 .app header h1 {
-   color: #fff;
+   color: dodgerblue;
    font-size: 24px;
-   font-weight: 400;
+   font-weight: 700;
 }
 
 .app header button {
-   color: #fff;
+   color: dodgerblue;
    font-size: 18px;
-   border-bottom: 2px solid #fff;
+   border-bottom: 2px solid dodgerblue;
    text-transform: uppercase;
 }
 
@@ -84,7 +84,8 @@ main {
 }
 
 .item input[type="text"]:not(:disabled) {
-   border-bottom: 2px solid #fff;
+   border-bottom: 2px solid darkorange;
+   color: darkorange;
 }
 
 .item.complete {
