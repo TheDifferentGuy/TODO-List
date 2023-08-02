@@ -101,6 +101,10 @@ main{
    margin-bottom: 1rem;
 }
 
+#tasks .task .content{
+   flex: 1 1 0%;
+}
+
 #tasks .task .content .text{
    color: var(--light);
    font-size: 1.125rem;
@@ -110,7 +114,7 @@ main{
 }
 
 #tasks .task .content .text:not(:read-only) {
-   color: #e0ffff;
+   color: var(--orange);
 }
 
 
